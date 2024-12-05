@@ -8,6 +8,28 @@ async function get_all_order(){
     return orders
 }
 
+async function get_orderstatus(order_id) {
+    const orderStatus = await order_model.get_status(order_id);
+    return orderStatus;
+}
+
+async function get_orderstatus (){
+    try{
+        const order = await orderModel.getOrderStatusById(order_id);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found.' });
+    }
+    res.status(200).json({
+        order_id: order.order_id,
+        status: order.status,
+      });
+    } catch (error) {
+      console.error('Error fetching order status:', error);
+      res.status(500).json({ message: 'An error occurred while fetching the order status.', error });
+    }
+  };
+
 async function create_order_from_cart(user_id, payment_method, address) {
     const cart_items = await cart_model.fetch_cart_items(user_id);
     
@@ -62,4 +84,4 @@ async function update_order_status(order_id, order_status) {
 
   
 
-module.exports = {get_all_order, create_order_from_cart, update_order, update_order_status, create_order_from_cart}
+module.exports = {get_all_order, get_orderstatus, create_order_from_cart, update_order, update_order_status, create_order_from_cart}

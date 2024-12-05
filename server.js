@@ -125,6 +125,27 @@ app.get('/order', async (req, res) =>{
     res.send(carts)
 })
 
+app.get('/order/:order_id/status', async (req, res) =>{
+    const orderStatus = await order_controller.get_orderstatus(req.params.order_id)
+    res.send(orderStatus)
+})
+
+app.get('/order/:order_id/status', async (req, res) => {
+    const order_id = req.params.order_id;
+
+    try {
+        const cartItems = await order_controller_controller.get_cart_items(order_id);
+        if (cartItems.length > 0) {
+            res.status(200).json({ success: true, data: cartItems });
+        } else {
+            res.status(404).json({ success: false, message: 'No items in the cart.' });
+        }
+    } catch (error) {
+        console.error("Error in GET /cart:", error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
 // Endpoint routing POST order
 app.post('/order', async (req, res) =>{
     const user_id = req.body.user_id;

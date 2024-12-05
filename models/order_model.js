@@ -17,6 +17,22 @@ async function get_all() {
     });
 }
 
+async function get_status(order_id, order_status) {
+    const querySql = `SELECT id AS order_id, status FROM t_order WHERE id = ?`;
+
+    // Await the promise
+    return new Promise((resolve, reject) => {
+        db.query(querySql, [order_id, order_status], (err, rows) => {
+            if (err) {
+                console.error("Error executing query:", err);
+                return reject(err);
+            }
+            resolve(rows);
+        });
+    });
+}
+
+
 // function add payment_method and adress
 async function add_order(user_id, payment_method, address, total_price, order_status) {
     const querySql = `INSERT INTO t_order (user_id, payment_method, address, total_price, order_status) VALUES (?, ?, ?, ?, ?) `;
@@ -64,15 +80,5 @@ async function update_status_byorderid(order_id, order_status) {
     });
 }
 
-const getCartByUserId = async (userId) => {
-    const cartItems = await db.query(
-      `SELECT m.id AS menu_id, m.item_name, m.price, c.quantity 
-       FROM t_cart c 
-       JOIN menu m ON c.menu_id = m.id 
-       WHERE c.user_id = ?`,
-      [userId]
-    );
-    return cartItems; // Return the query result
-  };
 
-module.exports = {get_all, add_order, update_order_bycartid, update_status_byorderid, getCartByUserId};
+module.exports = {get_all, add_order, update_order_bycartid, update_status_byorderid, get_status};
