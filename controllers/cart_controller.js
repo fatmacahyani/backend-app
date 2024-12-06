@@ -52,19 +52,6 @@ async function add_cart_item(cartItem){
     }
 }
 
-// async function add_cart_item(cartItem){
-//     if(cartItem.menu_id == null){
-//         return 0;
-//     }
-    
-//     if(cartItem.quantity == null){
-//         return 0;
-//     }
-
-//     const result = await cart_model.add_item(cartItem);
-//     return 1;
-// }
-
 async function delete_cart_item(id){
     const carts = await cart_model.delete_item(id);
     return carts

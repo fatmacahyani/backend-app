@@ -5,7 +5,6 @@ const db = require('./interface_db')
 async function get_all() {
     const querySql = `SELECT * FROM t_cart`;
 
-    // Await the promise
     return new Promise((resolve, reject) => {
         db.query(querySql, (err, rows) => {
             if (err) {
@@ -35,6 +34,7 @@ async function fetch_cart_items(user_id) {
 // function add cart
 async function add_item(cartItem) {
     const querySql = `INSERT INTO t_cart (user_id, menu_id, quantity, menu_name, price) VALUES (?, ?, ?, ?, ?)`;
+
     return new Promise((resolve, reject) => {
         db.query(querySql, [cartItem.user_id, cartItem.menu_id, cartItem.quantity, cartItem.menu_name, cartItem.price], (err, result) => {
             if (err) {
@@ -50,6 +50,7 @@ async function add_item(cartItem) {
 // function delete cart
 async function delete_item(id) {
     const querySql = `DELETE FROM t_cart WHERE id = ? `;
+
     return new Promise((resolve, reject) => {
         db.query(querySql, [id], (err, result) => {
             if (err) {
@@ -64,6 +65,7 @@ async function delete_item(id) {
 // function update cart
 async function update_item(id, quantity) {
     const querySql = `UPDATE t_cart SET quantity = ? WHERE id = ?`;
+
     return new Promise((resolve, reject) => {
         db.query(querySql, [quantity, id], (err, result) => {
             if (err) {
@@ -78,6 +80,7 @@ async function update_item(id, quantity) {
 // function update cart
 async function update_item_total_price(id, price) {
     const querySql = `UPDATE t_cart SET price = ? WHERE id = ?`;
+    
     return new Promise((resolve, reject) => {
         db.query(querySql, [price, id], (err, result) => {
             if (err) {

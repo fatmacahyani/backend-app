@@ -5,7 +5,6 @@ const db = require('./interface_db')
 async function get_all() {
     const querySql = `SELECT * FROM t_menu`;
 
-    // Await the promise
     return new Promise((resolve, reject) => {
         db.query(querySql, (err, rows) => {
             if (err) {
@@ -21,7 +20,6 @@ async function get_all() {
 async function get_menu_byname(name) {
     const querySql = `SELECT * FROM t_menu WHERE item_name = '${name}'`;
 
-    // Await the promise
     return new Promise((resolve, reject) => {
         db.query(querySql, (err, rows) => {
             if (err) {
@@ -37,7 +35,6 @@ async function get_menu_byname(name) {
 async function get_menu_by_id(id) {
     const querySql = `SELECT * FROM t_menu WHERE id = '${id}'`;
 
-    // Await the promise
     return new Promise((resolve, reject) => {
         db.query(querySql, (err, rows) => {
             if (err) {
@@ -53,7 +50,6 @@ async function get_menu_by_id(id) {
 async function get_menu_bycategory(category) {
     const querySql = `SELECT * FROM t_menu WHERE categories = '${category}'`;
 
-    // Await the promise
     return new Promise((resolve, reject) => {
         db.query(querySql, (err, rows) => {
             if (err) {
