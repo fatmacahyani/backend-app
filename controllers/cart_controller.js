@@ -1,4 +1,5 @@
 const cart_model = require('../models/cart_model');
+const menu_model = require('../models/menu_model');
 
 
 async function get_all_cart(){
@@ -13,17 +14,56 @@ async function get_cart_items(user_id) {
 
 
 async function add_cart_item(cartItem){
-    if(cartItem.menu_id == null){
-        return 0;
-    }
-    
-    if(cartItem.quantity == null){
-        return 0;
+    if (!cartItem.menu_id || !cartItem.user_id || !cartItem.quantity) {
+        throw new Error("menu_id, user_id, and quantity are required");
     }
 
-    const result = await cart_model.add_item(cartItem);
-    return 1;
+    const carts_tersedia = await cart_model.get_all();
+
+    menu_id_sama = false;
+    id_menu_id_sama = 0;
+    for (let i = 0; i < carts_tersedia.length; i++) {
+        if(carts_tersedia[i].menu_id == cartItem.menu_id && carts_tersedia[i].user_id == cartItem.user_id){
+            menu_id_sama = true;
+            id_menu_id_sama = carts_tersedia[i].id; 
+            break;
+        }
+    }
+
+    if(menu_id_sama == true){
+        const menu_property = await menu_model.get_menu_by_id(cartItem.menu_id);
+
+        const carts = await cart_model.update_item(id_menu_id_sama, cartItem.quantity);
+        let harga_baru = menu_property[0].price * cartItem.quantity;
+        const carts2 = await cart_model.update_item_total_price(id_menu_id_sama, harga_baru);
+        return carts2
+    }else {
+        try {
+            const menu_property = await menu_model.get_menu_by_id(cartItem.menu_id);
+            cartItem.menu_name = menu_property[0].item_name;
+            cartItem.price = menu_property[0].price * cartItem.quantity;
+
+            const result = await cart_model.add_item(cartItem);
+            return { success: true, message: "Item added to cart successfully", data: result };
+        } catch (error) {
+            console.error("Error adding cart item:", error);
+            throw new Error("Failed to add item to cart");
+        }
+    }
 }
+
+// async function add_cart_item(cartItem){
+//     if(cartItem.menu_id == null){
+//         return 0;
+//     }
+    
+//     if(cartItem.quantity == null){
+//         return 0;
+//     }
+
+//     const result = await cart_model.add_item(cartItem);
+//     return 1;
+// }
 
 async function delete_cart_item(id){
     const carts = await cart_model.delete_item(id);

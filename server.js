@@ -46,11 +46,6 @@ app.get('/menu/category/:category', async (req, res) =>{
 
 //=================================================================================================================
 
-// Endpoint routing GET cart
-// app.get('/cart', async (req, res) =>{
-//     const carts = await cart_controller.get_all_cart()
-//     res.send(carts)
-// })
 
 // Endpoint routing GET cart by userid
 app.get('/cart/:user_id', async (req, res) => {
@@ -71,29 +66,17 @@ app.get('/cart/:user_id', async (req, res) => {
 
 
 // Endpoint routing POST cart
-app.post('/cart', async (req,res) =>{ 
-    const menu_id = req.body.menu_id; 
-    const quantity = req.body.quantity;
-    const carts = await cart_controller.add_cart_item (req.body); 
-    if(carts == 1){
-        res.status(201).json({ success: true, message: 'Berhasil insert data cart!' });
-    }
-    else {
-        res.status(405).json({ success: false, message: 'Gagal insert data cart!' }); 
-    }
-}) 
+app.post('/cart', async (req, res) => {
+    const { menu_id, user_id, quantity } = req.body;
 
-// app.post('/cart', async (req, res) => {
-//     const { menu_id, user_id, quantity } = req.body;
-
-//     try {
-//         const result = await cart_controller.add_cart_item({ menu_id, user_id, quantity });
-//         res.status(201).json(result);
-//     } catch (error) {
-//         console.error("Error in POST /cart:", error.message);
-//         res.status(400).json({ success: false, message: error.message });
-//     }
-// });
+    try {
+        const result = await cart_controller.add_cart_item({ menu_id, user_id, quantity });
+        res.status(201).json({success: true, message: 'Item added successfully', data: result});
+    } catch (error) {
+        console.error("Error in POST /cart:", error.message);
+        res.status(400).json({ success: false, message: error.message });
+    }
+});
 
 // Endpoint routing DELETE cart
 app.delete('/cart/:id', async (req, res) => {
@@ -119,61 +102,57 @@ app.put('/cart/:id', async (req, res) => {
 
 //=================================================================================================================
 
-// Endpoint routing GET order
-app.get('/order', async (req, res) =>{
-    const carts = await order_controller.get_all_order()
-    res.send(carts)
-})
-
-app.get('/order/:order_id/status', async (req, res) =>{
-    const orderStatus = await order_controller.get_orderstatus(req.params.order_id)
-    res.send(orderStatus)
-})
-
-app.get('/order/:order_id/status', async (req, res) => {
-    const order_id = req.params.order_id;
-
-    try {
-        const cartItems = await order_controller_controller.get_cart_items(order_id);
-        if (cartItems.length > 0) {
-            res.status(200).json({ success: true, data: cartItems });
-        } else {
-            res.status(404).json({ success: false, message: 'No items in the cart.' });
-        }
-    } catch (error) {
-        console.error("Error in GET /cart:", error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
-});
-
 // Endpoint routing POST order
-app.post('/order', async (req, res) =>{
-    const user_id = req.body.user_id;
-    const payment_method = req.body.payment_method;
-    const address = req.body.address;
-    const carts = await order_controller.create_order_from_cart(user_id, payment_method, address);
-    res.send(carts)
-})
-
-// Endpoint routing PUT order
-app.put('/order', async (req, res) => {
+app.post('/order', async (req, res) => {
     const { user_id, payment_method, address } = req.body;
 
     if (!user_id || !payment_method || !address) {
-        return res.status(400).json({
-            success: false,
-            message: 'user_id, payment_method, and address are required.',
-        });
+        return res.status(400).json({ success: false, message: "user_id, payment_method, and address are required" });
     }
 
     try {
-        const response = await order_controller.update_order(user_id, payment_method, address);
-        res.status(response.success ? 200 : 400).json(response);
+        const order = await order_controller.create_order_from_cart(user_id, payment_method, address);
+        res.status(201).json(order);
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'An error occurred while updating the order.',
-        });
+        console.error("Error in POST /order:", error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Endpoint routing GET all order
+app.get('/order', async (req, res) => {
+    try {
+        const orders = await order_controller.get_all_orders();
+        res.status(200).json(orders);
+    } catch (error) {
+        console.error("Error in GET /orders:", error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Endpoint routing GET order by id
+app.get('/order/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const order = await order_controller.get_order_by_id(id);
+        res.status(200).json(order);
+    } catch (error) {
+        console.error("Error in GET /order/:id:", error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Endpoint routing GET order by user_id
+app.get('/order/:user_id', async (req, res) => {
+    const { user_id } = req.params;
+
+    try {
+        const orders = await order_controller.get_order_by_userid(user_id);
+        res.status(200).json(orders);
+    } catch (error) {
+        console.error("Error in GET /user/:user_id/orders:", error.message);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
@@ -184,9 +163,7 @@ app.put('/order/:id/status', async (req, res) => {
     const { order_status} = req.body;
 
     if (!order_status) {
-        return res.status(400).json({
-            success: false,
-            message: 'order_status is required.',
+        return res.status(400).json({success: false, message: 'order_status is required.',
         });
     }
 
@@ -201,13 +178,23 @@ app.put('/order/:id/status', async (req, res) => {
     }
 });
 
-app.post('/order', async (req, res) =>{
-        const user_id = req.body.user_id;
-        const payment_method = req.body.payment_method;
-        const address = req.body.address;
-        const carts = await order_controller.createOrderFromCart(user_id, payment_method, address);
-        res.send(carts)
-});
+
+// Endpoint routing GET order
+// app.get('/order/:order_id/status', async (req, res) => {
+//     const order_id = req.params.order_id;
+
+//     try {
+//         const cartItems = await order_controller_controller.get_cart_items(order_id);
+//         if (cartItems.length > 0) {
+//             res.status(200).json({ success: true, data: cartItems });
+//         } else {
+//             res.status(404).json({ success: false, message: 'No items in the cart.' });
+//         }
+//     } catch (error) {
+//         console.error("Error in GET /cart:", error);
+//         res.status(500).json({ success: false, message: 'Internal Server Error' });
+//     }
+// });
 
 //=================================================================================================================
 
