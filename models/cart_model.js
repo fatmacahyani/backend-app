@@ -62,6 +62,21 @@ async function delete_item(id) {
     });
 }
 
+// function clear cart
+async function clear_cart(user_id) {
+    const querySql = `DELETE FROM t_cart WHERE user_id = ? `;
+
+    return new Promise((resolve, reject) => {
+        db.query(querySql, [user_id], (err, result) => {
+            if (err) {
+                console.error("Error deleting item:", err);
+                return reject(err);
+            }
+            resolve(result);
+        });
+    });
+}
+
 // function update cart
 async function update_item(id, quantity) {
     const querySql = `UPDATE t_cart SET quantity = ? WHERE id = ?`;
@@ -92,4 +107,4 @@ async function update_item_total_price(id, price) {
     });
 }
 
-module.exports = {get_all, add_item, delete_item, update_item, update_item_total_price, fetch_cart_items};
+module.exports = {get_all, add_item, delete_item, clear_cart, update_item, update_item_total_price, fetch_cart_items};

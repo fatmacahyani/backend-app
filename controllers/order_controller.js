@@ -44,12 +44,22 @@ async function create_order_from_cart(user_id, payment_method, address) {
 
         const order = await order_model.add_order(user_id, payment_method, address, total_price, status);
 
+       // await cart_model.clear_cart(user_id);
+
         return { success: true, message: "Order created successfully", order };
     } catch (error) {
         console.error("Error creating order from cart:", error);
         throw new Error(error.message);
     }
 }
+
+// Clear cart in front end and update order_id in t_cart
+// for (let i = 0; i < cart_items.length; i++) {
+//     await cart_model.update_order_id(cart_items[i].id, order.id);
+// }
+
+// // Assuming you have a function to clear the cart in the front end
+// await cart_model.clear_cart_frontend(user_id);
 
 // controller get all order
 async function get_all_orders(){

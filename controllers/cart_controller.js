@@ -57,6 +57,7 @@ async function delete_cart_item(id){
     return carts
 }
 
+
 async function update_cart_item(id, quantity) {
     const carts = await cart_model.update_item(id, quantity);
     return carts

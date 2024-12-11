@@ -89,6 +89,16 @@ app.delete('/cart/:id', async (req, res) => {
     }
 });
 
+app.delete ('cart/clear', async (req, res) => {
+    try {
+        const result = await cart_controller.clear_cart(req.params.user_id);
+        res.status(200).json({ success: true, message: "Cart cleared successfully", data: result });
+    } catch (error) {
+        console.error("Error clearing cart:", error);
+        res.status(500).json({ success: false, message: "Failed to clear cart" });
+    }
+});
+
 // Endpoint routing UPDATE cart
 app.put('/cart/:id', async (req, res) => {
     try {
