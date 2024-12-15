@@ -29,6 +29,7 @@ async function get_menu_bycategory(category){
     return menus
 }
 
+
 async function add_image(imagePath) {
     try {
         const images = await menu_model.insert_image(imagePath);

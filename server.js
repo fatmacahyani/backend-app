@@ -1,14 +1,13 @@
 const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path'); // Import path module
+const path = require('path');
 const app = express();
 
 const port = 3001;
 const menu_controller = require('./controllers/menu_controller');
 const cart_controller = require('./controllers/cart_controller');
 const order_controller = require('./controllers/order_controller');
-// const upload = require('./Middleware/upload');
 
 app.use(cors());
 
@@ -71,10 +70,10 @@ app.post('/cart', async (req, res) => {
 
     try {
         const result = await cart_controller.add_cart_item({ menu_id, user_id, quantity });
-        res.status(201).json({success: true, message: 'Item added successfully', data: result});
+        res.status(201).json({success: true, message: "Item added successfully", data: result});
     } catch (error) {
-        console.error("Error in POST /cart:", error.message);
-        res.status(400).json({ success: false, message: error.message });
+        console.error("Error in POST /cart:", error);
+        res.status(400).json({ success: false, message: "Failed to add menu" });
     }
 });
 
